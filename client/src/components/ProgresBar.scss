@@ -1,0 +1,23 @@
+.progressBar {
+  display: flex;
+  align-self: center;
+  position: relative;
+  height: 8px;
+  width: 200px;
+  border-radius: 50px;
+  border: 1px solid #EDEDED;
+  background: #EDEDED;
+}
+
+.filler {
+  display: inline-flex;
+  align-self: center;
+  background: #51F6B2;
+  height: 100%;
+  border-radius: inherit;
+  transition: width .2s ease-in;
+}
+
+.percentageValue {
+  display: inline-flex;
+}

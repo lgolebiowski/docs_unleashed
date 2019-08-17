@@ -1,0 +1,14 @@
+.resultsPageButtonWrapper {
+  position: absolute;
+  top: 3.5rem;
+  right: 3.5rem;
+  a {
+    text-decoration: none;
+  }
+}
+
+.resultsListWrapper {
+  .listContainer {
+    display: grid;
+  }
+}

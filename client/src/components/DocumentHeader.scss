@@ -1,0 +1,13 @@
+.documentHeaderWrapper {
+  display: flex;
+  justify-content: center;
+  justify-self: center;
+  align-content: center;
+  margin: 8rem;
+  background: #EDEDED;
+  box-shadow: 2px 2px 10px rgba(230, 230, 230, 0.25);
+  border-radius: 70px;
+  .documentHeaderBox {
+    padding: 0.5rem 14rem;
+  }
+}
