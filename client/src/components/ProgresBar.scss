@@ -2,15 +2,17 @@
   display: flex;
   align-self: center;
   position: relative;
+}
+.fillerBox {
+  margin-right: 1rem;
+  align-self: center;
   height: 8px;
   width: 200px;
   border-radius: 50px;
   border: 1px solid #EDEDED;
   background: #EDEDED;
 }
-
 .filler {
-  display: inline-flex;
   align-self: center;
   background: #51F6B2;
   height: 100%;

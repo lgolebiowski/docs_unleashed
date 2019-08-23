@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
+import { Link, Redirect } from "react-router-dom";
 import Button from './Button';
-import InputButton from './InputButton';
 import Header from './Header';
 import Spinner from './Spinner';
 import img_main from './images/img_main.svg';
@@ -8,21 +8,32 @@ import img_done from './images/img_done.svg';
 import './StepPage.scss';
 
 function StepPage(props) {
+
+  const delayedRedirect = (time) => {setTimeout(
+    delayIt(true), time
+  )}
+
+  const [redirect, delayIt] = useState(false);
+
+  useEffect(() => {
+    delayedRedirect(9800)
+  });
+
   const { 
     titles,
     handleImageUpload,
     getData,
     loading,
-    fieldId
+    fieldId,
+    fields
   } = props;
   return (
     <div className="StepPageWrapper">
-      <div>
         <img src={img_main} className="" alt="logo" />
         {loading &&
           <Fragment>
             <div className="headerWrapper">
-              <Header title={titles.upload}/>
+              <Header title={titles.uploading}/>
             </div>
             <div className="iconWrapper">
               <Spinner/>
@@ -34,10 +45,6 @@ function StepPage(props) {
           <div className="title">
             <Header title={titles.upload}/>
           </div>
-          <div className="iconWrapper">
-            <img src={img_done} className="" alt="logo" />
-          </div>
-          
           <Button
             title='upload'
             handleImageUpload={handleImageUpload}
@@ -45,18 +52,31 @@ function StepPage(props) {
           />
         </Fragment>
         }
-        {/* {fieldId && 
+        {fieldId &&
           <Fragment>
             <div className="titleMain">
-              <h1>{titles.done}</h1>
+              <Header title={titles.done}/>
             </div>
-            <Button
-              title={titles.download}
-              onclick={getData}
-            />
+            <div className="iconWrapper">
+              <img src={img_done} className="" alt="logo" />
+            </div>  
+            {/* <Link to={{
+              pathname: '/results',
+              }}>
+                <Button
+                  title={titles.download}
+                />
+              </Link> */}
+              {redirect &&
+              <Redirect
+                to={{
+                  pathname: "/results",
+                }}
+              />
+              }
+            
           </Fragment>
-        } */}
-      </div>
+        }
     </div>
   )
 }

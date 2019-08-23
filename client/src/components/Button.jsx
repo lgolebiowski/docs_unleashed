@@ -3,14 +3,14 @@ import { boolean, string } from 'prop-types';
 import './Button.scss';
 
 function Button(props) {
-  const { isInput, onClick } = props;
+  const { isInput, handleImageUpload, onclick } = props;
   return (
     <div 
       className="buttonWrapper"
       onClick={onclick}
     >
       {isInput && <input
-          // onChange={e => props.handleImageUpload(e)}
+          onChange={e => handleImageUpload(e)}
           type="file"
           id="fileUpload" 
         />}

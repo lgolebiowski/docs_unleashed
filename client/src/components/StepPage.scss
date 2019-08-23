@@ -1,8 +1,11 @@
 .StepPageWrapper {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  justify-items: center;
   margin: 12rem 0;
   .iconWrapper {
     margin: 3.6rem
+  }
+  p {
+    margin: 0;
   }
 }

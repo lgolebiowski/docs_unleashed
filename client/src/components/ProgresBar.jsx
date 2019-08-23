@@ -17,8 +17,10 @@ function ProgresBar(props) {
 
   return (
     <div className="progressBar">
-      <div className="percentageValue">{parseFloat((props.percentage*100).toFixed(3))}</div>
-      <Filler percentage={props.percentage}/>
+      <div className="fillerBox">
+        <Filler percentage={props.percentage}/>
+      </div>
+      <div className="percentageValue">{`${parseFloat((props.percentage*100).toFixed(1))}%`}</div>
     </div>
   )
 }

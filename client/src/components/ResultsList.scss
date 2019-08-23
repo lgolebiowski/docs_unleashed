@@ -11,4 +11,11 @@
   .listContainer {
     display: grid;
   }
+  .resultsListBox {
+    display: grid;
+    justify-items: center;
+    p { 
+      margin: 0 
+    }
+  }
 }

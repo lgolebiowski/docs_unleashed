@@ -1,96 +1,53 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { array } from 'prop-types';
 import { Link } from "react-router-dom";
 import DocumentHeader from './DocumentHeader';
 import ProgressCircle from './ProgressCircle';
 import ResultsItem from './ResultsItem';
+import PreviewModal from './PreviewModal';
+import Header from './Header';
 import Button from './Button';
+import Spinner from './Spinner';
+import img_main from './images/img_main.svg';
 import './ResultsList.scss';
 
-const fields = [
-  {
-    name: 'invoice.gst',
-    value: '304.80',
-    confidence: 0.9681321445013021,
-    boundingBox: [Object]
-  },
-  {
-    name: 'invoice.dueDate',
-    value: '2018-11-11',
-    confidence: 0.5933404538436766,
-    boundingBox: [Object]
-  },
-  {
-    name: 'invoice.purchaseOrderNo',
-    value: null,
-    confidence: 0.9429813746456704,
-    boundingBox: null
-  },
-  {
-    name: 'invoice.total',
-    value: '2844.80',
-    confidence: 0.9120387857678078,
-    boundingBox: [Object]
-  },
-  {
-    name: 'invoice.amountDue',
-    value: '2844.80',
-    confidence: 0.8467959087169304,
-    boundingBox: [Object]
-  },
-  {
-    name: 'invoice.amountPaid',
-    value: null,
-    confidence: 0.8913786573543437,
-    boundingBox: null
-  },
-  {
-    name: 'invoice.tax',
-    value: '304.80',
-    confidence: 0.9230812675589126,
-    boundingBox: [Object]
-  },
-  {
-    name: 'invoice.subTotal',
-    value: '2540.00',
-    confidence: 0.9819441432788888,
-    boundingBox: [Object]
-  },
-  {
-    name: 'document.supplierGSTN',
-    value: null,
-    confidence: 0.9542778193680761,
-    boundingBox: null
-  },
-  {
-    name: 'document.referenceNo',
-    value: 'INVO2061',
-    confidence: 0.9115599416426258,
-    boundingBox: [Object]
-  },
-  {
-    name: 'document.type',
-    value: [Object],
-    confidence: 0.6805119999999999,
-    boundingBox: null
-  },
-  {
-    name: 'document.supplierABN',
-    value: null,
-    confidence: 0.8407658089135305,
-    boundingBox: null
-  },
-  {
-    name: 'document.date',
-    value: '2018-11-11',
-    confidence: 0.9747789321168238,
-    boundingBox: [Object]
+
+class ResultsList extends Component {
+
+  static getDerivedStateFromProps(props,state) {
+    const {
+      fields
+    } = props;
+    return { fields };
   }
-]
 
-function ResultsList(props) {
+  componentDidMount() {
+    this.mobileMediaQuery = window.matchMedia(`(max-width: ${768}px)`);
+    this.mobileMediaQuery.addListener(this.mobileMediaQueryHandler);
+    this.setState({
+      isMobile: this.mobileMediaQuery.matches,
+    });
+    const { fieldId, getImage } = this.props;
+    getImage();
+  }
 
-  const getFiltered = (type) => {
+  componentDidUpdate(prevProps, prevState) {
+    const { fields, fieldId, hasImage, getImage } = this.props;
+    const { isLoading } = this.state;
+    if (fields && isLoading) { this.setState({isLoading: false})}
+
+    if (prevProps.fieldId !== fieldId) {
+      getImage();
+    }
+    if (prevProps.hasImage !== hasImage) {
+      this.setState({
+        img_path: fieldId.fileId
+      })
+    }
+  }
+
+  getFiltered = (type) => {
+    const { fields } = this.state;
     return (
     fields
     .filter(item => item.value)
@@ -98,26 +55,85 @@ function ResultsList(props) {
     .filter(item => (typeof item[1] === 'string' || typeof item[1] === 'number')))
   )}
 
-  console.log(fields);
-  let filtered = getFiltered('entries');
-  let filteredHeaders = getFiltered('entries').slice(0,1);
-
-  const getList = (content, headers) => {
+  getList = (content, headers) => {
    return content.map(result => {
-      console.log(result);
+      const { checkAbn } = this.props;
       return (
         <ResultsItem
           result={result}
           key={result.name}
           header={headers}
+          checkAbn={checkAbn}
+          handleCheckboxChange={(e,r) => this.handleCheckboxChange(e,r)}
         />
       )
     })
   }
 
+  getCsv = async () => {
+    debugger;
+    const { fieldsChecked } = this.state;
+    let fieldsCopy = fieldsChecked
+      .map(fi => {
+        let fieldCopy = fi
+        delete fieldCopy.boundingBox;
+        return fieldCopy;
+      })
+      .filter(field => field.checked)
+      .map(fi => {
+        let fieldCopy = fi
+        delete fieldCopy.checked;
+        return fieldCopy;
+      })
+      console.log({fieldsCopy});
+      console.log(JSON.stringify(fieldsCopy));
+     
+    const response = await fetch('/getCsv', {
+      method: 'POST',
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(fieldsCopy)
+    })
+    const body = await response;
+    console.log(body);
+  }
+
+  handleCheckboxChange = (event, result) => {
+    const { fields } = this.state;
+    const { target: { checked } } = event;
+    let name = result[0][1];
+    const fieldsCopy = [...fields].map((field) => {
+      if(field.name === name) {
+        field.checked = checked;
+      }
+      return field;
+    });
+
+    this.setState({fieldsChecked: fieldsCopy});
+    console.log(fieldsCopy);
+  }
+
+  handleGetDataClick = () => {
+    const { getData } = this.props;
+    this.setState({isLoading: true}, getData)
+  }
+  
+  render() {
+    // this.getCSV(this.state.fields);
+    let filtered = this.getFiltered('entries');
+    let filteredHeaders = this.getFiltered('entries').slice(0,1);
+    console.log(filteredHeaders);
+    const { titles, getImage, fieldId, hasImage } = this.props;
+    const { fields, isLoading, img_path } = this.state;
+
   return (
     <div>
       <div className="resultsPageButtonWrapper">
+          <Button
+            title={'get_IMG'}
+            onclick={getImage}
+          />
           <Link to={'/'}>
             <Button
               title='Upload new document'
@@ -125,21 +141,63 @@ function ResultsList(props) {
           </Link>
       </div>
       <div className="resultsListWrapper">
-        <DocumentHeader/>
-        <ProgressCircle/>
+        <div className="resultsListBox">
+         {fieldId &&
+          <div>
+            <img src={`http://localhost:5000/content/img_${img_path}.png?${Date.now()}`} className="" alt="logo" />
+          </div>
+        }
+          <DocumentHeader/>
+          {
+            !fields.length &&
+            <div className="titleMain">
+              <Header title={titles.done}/>
+            </div>
+          }
+          {fieldId &&
+          <PreviewModal 
+            hasImage={hasImage} 
+            img_path={`http://localhost:5000/content/img_${fieldId.fileId}.png`}/>
+          }
+          {
+            !fields.length &&
+          <div className="titleMain">
+            <Header title={titles.done}/>
+          </div> &&
+          <Button
+            title={titles.download}
+            onclick={this.handleGetDataClick}
+          />
+          }
+        </div>
+        {
+          fields.length
+          && <ProgressCircle/>
+        }
+        {
+          isLoading && <Spinner/>}
         <div className="listContainer" role="table" aria-label="Fields">
-          {getList(filteredHeaders, true)}
-          {getList(filtered, false)}
+          { this.getList(filteredHeaders, true) }
+          { this.getList(filtered, false) }
+          {
+            fields.length
+            && <div className="resultsListBox">
+               <Button
+                title={titles.csv}
+                onclick={this.getCsv}
+              />
+            </div>
+          }
         </div>
       </div>
     </div>
-  )
+  )}
 }
 
 export default ResultsList
 
 ResultsList.defaultProps = {
-
+  fields: [],
 };
 
 ResultsList.propTypes = {

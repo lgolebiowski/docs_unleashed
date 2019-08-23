@@ -21,12 +21,19 @@
       display: grid;
       /* grid-template-columns: 1fr; */
       grid-gap: 20px;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+      align-items: center;
+      grid-template-columns: 1rem 1fr 1fr 1fr;
     }
     .header {
-      background-color: #EDEDED;
-      border: 1px solid #000;
-
+      color: #fff;
+      background-color: #14293C;
+      border-top-left-radius: 0.7rem;
+      border-top-right-radius: 0.7rem;
+      p {
+        font-size: 1.8rem;
+        letter-spacing: 0.06em;
+        line-height: 21px;
+      }
     }
     .element {
       padding: 1rem 3rem
